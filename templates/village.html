@@ -1,0 +1,73 @@
+<html>
+     <head>
+        <title>Flask-SocketIO-Chat</title>
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+rel="stylesheet" type="text/css" />
+<link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css"
+rel="stylesheet" type="text/css">
+</head>
+  
+ <body>
+  <h1>Inside Village</h1>
+  <div class="row">
+      <div class="col-sm-12">
+    <div class="col-sm-4">
+        Yojana: <input type="text" id="yojana_id" maxlength="4" size="4">
+        Village :<input type="text" id="village_id" maxlength="4" size="4">
+        PLot :<input type="text" id="plot" maxlength="4" size="4">
+         <button class="add_field_button" onclick = "village()">show</button>
+    </div>
+    <div class="col-sm-4">
+        kml_mapping_info_id: <input type="text" id="kml_upload_id">
+        <button class="add_field_button" onclick = "upload()">Upload</button>
+    </div>
+    <div class="col-sm-4">
+        kml_mapping_info_id: <input type="text" id="kml_update_id">
+        <button class="add_field_button" onclick = "update()">update</button>
+    </div>
+     </div>
+  </div>
+  <div id="plt"></div>
+  <script > 
+
+  function village(){
+    var y = $("#yojana_id").val()
+    var v = $("#village_id").val()
+    var p = $("#plot").val()
+    console.log(y,v,p)
+    $.post("/village",{yojana_id:y,village_id:v,plot:p} ,function(data, status){
+        $("#plt").html(data);
+      });
+   }
+
+   function upload(){
+    var upload = $("#kml_upload_id").val()
+    console.log(upload)
+    $.post("/upload",{kml_upload_id:upload} ,function(data, status){
+        $("#plt").html(data);
+      });
+   }
+
+  function update(){
+    var update = $("#kml_update_id").val()
+    console.log(update)
+    $.post("/update",{kml_update_id:update} ,function(data, status){
+        $("#plt").html(data);
+      });
+   }
+
+
+  </script>
+
+ </body>
+</html>

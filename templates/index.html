@@ -1,0 +1,132 @@
+<html>
+    <head>
+        <title>Flask-SocketIO-Chat</title>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+rel="stylesheet" type="text/css" />
+<link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css"
+rel="stylesheet" type="text/css">
+</head>
+  
+ <body>
+ 
+    <nav class="navbar navbar-inverse">
+  	   <div class="container-fluid">
+    	   <div class="navbar-header">
+      		<a class="navbar-brand" href="#">Thrymr-LandsRecords</a>
+    	   </div>
+    	  <ul class="nav navbar-nav">
+              <li><a onclick= 'myfunction()'>Show Plots</a></li>
+              <li><a onclick = "baseChange('base1')">Base 1</a></li>
+              <li><a onclick = "baseChange('base2')">Base 2</a></li>
+              <li><a onclick="routeDef()" >Village base</a></li>
+          </ul>
+  	    </div>
+ 	</nav>
+  <div id="main">
+  <div class="input_fields_wrap">
+    <button class="add_field_button">Add More Fields</button>
+    <div><input type="text" name="mytext[]"></div>
+  </div>
+
+  <button onclick ='myfun()' class = "btn btn-primary btn-sm">Show</button>
+  <div id="plots"></div>
+  <div id="plot"></div>
+
+</div>
+
+
+<script type="text/javaScript">
+  
+  function routeDef(){
+    $.get("/routeDef", function(data, status){
+              //console.log(data)
+        $("#main").html(data);      
+      });
+
+  }
+
+
+
+  function village(){
+    var v = document.getElementById("Village")
+    var p = document.getElementById("plot")
+    vi = v.value
+    pl = p.value 
+    console.log(v.value,p.value)
+    $.post("/village",{Village:vi,plot:pl} ,function(data, status){
+        $("#plt").html(data);      
+      });
+   }
+      
+
+	function myfunction(){
+		console.log("Plotting.... ")
+		$.post("/plots", function(data, status){
+        			//console.log(data)
+				$("#plot").html(data);   		
+			});
+	}
+
+
+  function myfun(){
+    var mytext = document.getElementsByName("mytext[]")
+    var s = new Array();   
+ 
+    for (i = 0; i < mytext.length; i++) { 
+        s[i] = mytext[i].value
+    }
+    console.log(s);
+    console.log("Plotting.... ")
+    $.post("/plot",{arr:s} ,function(data, status){
+              //console.log(data)
+        $("#plot").html(data);      
+      });
+  }
+
+function baseChange(base){
+    if (base === 'base1'){
+         address = "sh/gdf1"
+    }else{
+         address  =  "sh/gdf2"  
+    }
+    $.post("/baseChange",{address:address}); 
+      /*,function(data, status){
+              //console.log(data)
+        $("#plot").html(data);      
+      });*/
+}
+
+
+$(document).ready(function() {
+    var max_fields      = 20; //maximum input boxes allowed
+    var wrapper         = $(".input_fields_wrap"); //Fields wrapper
+    var add_button      = $(".add_field_button"); //Add button ID
+    
+    var x = 1; //initlal text box count
+    $(add_button).click(function(e){ //on add input button click
+        e.preventDefault();
+        if(x < max_fields){ //max input box allowed
+            x++; //text box increment
+            $(wrapper).append('<div><input type="text" name="mytext[]"/><a href="#" class="remove_field">Remove</a></div>'); //add input box
+        }
+    });
+    
+    $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+        e.preventDefault(); $(this).parent('div').remove(); x--;
+    })
+});
+
+
+        
+	</script>
+    </body>
+    </html>

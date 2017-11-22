@@ -1,0 +1,66 @@
+
+  {% for link in links %}
+    {{link.render(embedded=embed_links)}}
+  {% endfor %}
+
+  <div id="map{{ mapid }}"></div>
+   <style>
+    {% block style %}
+    #map{{ mapid }} {
+      height:100%;
+    }
+    {% endblock %}
+  </style> 
+
+{% block script_main %}
+  <script text="text/javascript">
+
+var map = L.map('map{{ mapid }}');
+L.tileLayer(
+  "{{ tile_url }}",
+  {maxZoom:25, attribution: '{{ attribution }}'}).addTo(map);
+var od = {{otherdata}};
+
+var gjData = {{ geojson }};
+
+if (gjData.features.length != 0) {
+  var gj = L.geoJson(gjData, {
+    style: function (feature) {
+      return feature.properties;
+    },
+    pointToLayer: function (feature, latlng) {
+      var icon = L.divIcon({'html': feature.properties.html, 
+        iconAnchor: [feature.properties.anchor_x, 
+                     feature.properties.anchor_y], 
+          className: 'empty'});  
+      return L.marker(latlng, {icon: icon});
+    },
+  onEachFeature: function(feature, layer,latlng) {
+	layer.on('click', function(e) {
+		if (feature.properties.fillColor==="#FFFFFF"){
+
+        }else{
+             console.log(od.features[0].properties.properties)
+            layer.bindPopup(od.features[0].properties.properties);
+        }
+	 });
+    }
+  });
+
+  var odd = L.geoJson(od, {
+    style: function (feature) {
+      return feature.properties;
+    }});
+    map.fitBounds(odd.getBounds());
+
+
+  gj.addTo(map);
+  
+ 
+} else {
+  map.setView([0, 0], 1);
+}
+
+{% endblock %} 
+</script>
+

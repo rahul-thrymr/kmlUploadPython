@@ -1,0 +1,81 @@
+
+  {% for link in links %}
+    {{link.render(embedded=embed_links)}}
+  {% endfor %}
+
+  <div id="map{{ mapid }}"></div>
+  <div>
+    some text
+  </div>
+   <style>
+    {% block style %}
+    #map{{ mapid }} {
+      height:100%;
+    }
+    {% endblock %}
+  </style> 
+
+{% block script_main %}
+  <script text="text/javascript">
+
+var map = L.map('map{{ mapid }}');
+L.tileLayer(
+  "{{ tile_url }}",
+  {maxZoom:25, attribution: '{{ attribution }}'}).addTo(map);
+
+
+var od = {{otherdata}};
+
+var gjData = {{ geojson }};
+/*
+var anno=[];
+for(i=0;i<od.features.length;i++){
+	var ann = od.features[i].properties.ann;
+	var coor = od.features[i].properties.coords;
+	if(anno.indexOf(ann) === -1){
+		var marker = new L.Marker([coor[1],coor[0]], {
+    			icon: new L.DivIcon({
+        			className: 'my-div-icon',
+        			html: "<h5>"+ann+"</h5>"
+    			})
+		});
+		marker.addTo(map);
+		anno.push(ann);
+	}
+
+}
+*/
+if (gjData.features.length != 0) {
+  var gj = L.geoJson(gjData, {
+    style: function (feature) {
+      return feature.properties;
+    },
+    pointToLayer: function (feature, latlng) {
+      var icon = L.divIcon({'html': feature.properties.html, 
+        iconAnchor: [feature.properties.anchor_x, 
+                     feature.properties.anchor_y], 
+          className: 'empty'});  
+      return L.marker(latlng, {icon: icon});
+    },
+    onEachFeature: function(feature, layer,latlng) {
+	layer.bindPopup(feature.properties.data);
+	layer.on('click', function(e) {
+						
+		console.log(feature.properties.fillColor);
+		//myfun(feature.properties.od);		
+		//layer.bindPopup(d);
+
+	});
+	
+      }
+  });
+  gj.addTo(map);
+  
+  map.fitBounds(gj.getBounds());
+} else {
+  map.setView([0, 0], 1);
+}
+
+{% endblock %} 
+</script>
+
